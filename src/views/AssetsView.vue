@@ -1,96 +1,97 @@
 <template>
   <div>
-    <div class="flex justify-between items-center p-2">
-      <div class="flex gap-2">
-      <RouterLink to="/" class="font-bold"><</RouterLink>
-      <span class="text-lg font-bold">ASSETS</span>
-    </div>
-      <div calss="flex items-center">
-        <input v-model="newAssetName" type="text" placeholder="New asset name" class="bg-orange-100"/>
-        <span class="font-bold text-2xl cursor-pointer" @click="createAsset({name: newAssetName})">+</span>
+    <div class="flex flex-1 flex-col gap-4 p-6">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <RouterLink to="/" class="font-bold">
+            <FontAwesomeIcon 
+              :icon="faChevronLeft" 
+            />
+          </RouterLink>
+          <span class="font-bold text-2xl">ASSETS</span>
+        </div>
+        <span
+          class="font-bold text-2xl cursor-pointer"
+          @click="openCreateModal()"
+        >
+          +
+        </span>
       </div>
+      <AssetsList 
+        :assets="assets" 
+        @asset:delete="deleteAsset($event)"
+        @asset:update="openUpdateModal($event)" 
+        @asset:detail="openDetailPanel($event)"
+      />
     </div>
-    <AssetsList 
-      :assets="assets"
-      @asset:delete="deleteAsset($event)"
+    <AssetModal 
+      :opened="modalOpened" 
+      v-bind="updateData"
+      @modal:close="modalOpened = false"
+      @asset:created="getAssets()"
     />
+    <router-view :opened="detailPanelOpened" @panel:close="hideDetailPanel()"/>
   </div>
 </template>
 
 <script setup lang="ts">
-import axios from 'axios';
 import AssetsList from '../components/AssetsList.vue';
-import { API } from "../config.ts";
+import AssetModal from '../components/AssetModal.vue';
 import { ref } from 'vue';
+import { Asset } from '../types/assets.ts';
+import { apiDeleteAsset, apiGetAssets } from '../api/assets.ts';
+import { useRouter } from 'vue-router';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
-export interface CustomAsset { 
-  id: number;
-  name: string;
+const router = useRouter();
+
+const assets = ref<Asset[]>([]);
+
+const updateData = ref<Asset | undefined>(undefined);
+
+const detailPanelOpened = ref(false);
+const modalOpened = ref(false);
+
+function openCreateModal() { 
+  updateData.value = undefined;
+  modalOpened.value = true;
 }
 
-export interface CreateAssetData { 
-  name: string;
+function openUpdateModal(asset: Asset) { 
+  updateData.value = asset;
+  modalOpened.value = true;
 }
 
-const assets = ref<CustomAsset[]>([]);
-const newAssetName = ref('');
+function openDetailPanel(id: number) {
+  router.push({ name: 'asset', params: { id } });
+  detailPanelOpened.value = true;
+}
 
-function createAsset(asset: CreateAssetData) { 
-  return new Promise((resolve, reject) => {
-    axios({
-      method: "post",
-      url: `${API}/assets`,
-      data: asset,
-    })
-      .then((response) => {
-        console.log(response);
-        getAssets();
-        resolve(response);
-      })
-      .catch((err) => {
-        console.log(err);
-        reject(err);
-      });
+function hideDetailPanel() {
+  router.push({ name: 'assets' });
+  detailPanelOpened.value = false;
+}
+
+function deleteAsset(id: number) {
+  apiDeleteAsset(id).then((response) => {
+    console.log(response);
+    getAssets();
+  }).catch((err) => {
+    console.log(err);
   });
 }
 
-function deleteAsset(id: number) { 
-  return new Promise((resolve, reject) => {
-    axios({
-      method: "delete",
-      url: `${API}/assets/${id}`,
-    })
-      .then((response) => {
-        console.log(response);
-        getAssets();
-        resolve(response);
-      })
-      .catch((err) => {
-        console.log(err);
-        reject(err);
-      });
+function getAssets() {
+  apiGetAssets().then((response) => {
+    console.log(response);
+    assets.value = response.data;
+  }).catch((err) => {
+    console.log(err);
   });
 }
 
-function getAssets() { 
-  return new Promise((resolve, reject) => {
-    axios({
-      method: "get",
-      url: `${API}/assets/`,
-    })
-      .then((response) => {
-        console.log(response);
-        assets.value = response.data;
-        resolve(response);
-      })
-      .catch((err) => {
-        console.log(err);
-        reject(err);
-      });
-  });
-};
-
-function onCreated() { 
+function onCreated() {
   getAssets();
 }
 
