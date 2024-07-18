@@ -9,7 +9,7 @@ export function apiGetAssets(): AxiosPromise<Asset[]> {
   });
 }
 
-export function apiGetAssetById(id: number): AxiosPromise<Asset> {
+export function apiGetAssetById(id: string): AxiosPromise<Asset> {
   return request({
     url: `/assets/${id}`,
     method: 'get',
@@ -24,7 +24,7 @@ export function apiCreateAsset(data: CreateAssetData): AxiosPromise<Asset> {
   });
 }
 
-export function apiUpdateAsset(id: number, data: CreateAssetData): AxiosPromise<Asset> {
+export function apiUpdateAsset(id: string, data: CreateAssetData): AxiosPromise<Asset> {
   return request({
     url: `/assets/${id}`,
     method: 'put',
@@ -32,7 +32,7 @@ export function apiUpdateAsset(id: number, data: CreateAssetData): AxiosPromise<
   });
 }
 
-export function apiDeleteAsset(id: number): AxiosPromise<Asset> {
+export function apiDeleteAsset(id: string): AxiosPromise<Asset> {
   return request({
     url: `/assets/${id}`,
     method: 'delete',

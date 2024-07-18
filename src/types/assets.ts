@@ -1,5 +1,5 @@
 export interface Asset {
-  id: number;
+  id: string;
   name: string;
   description: string;
   value: number;
@@ -13,7 +13,7 @@ export interface CreateAssetData {
   location: string;
 }
 
-export enum AssetModalVariant { 
+export enum AssetModalVariant {
   CREATE,
   UPDATE,
 }

@@ -1,67 +1,61 @@
 <template>
-  <div v-if="opened" class="relative z-10" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
-  <!--
-    Background backdrop, show/hide based on slide-over state.
-
-    Entering: "ease-in-out duration-500"
-      From: "opacity-0"
-      To: "opacity-100"
-    Leaving: "ease-in-out duration-500"
-      From: "opacity-100"
-      To: "opacity-0"
-  -->
-  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-
-  <div class="fixed inset-0 overflow-hidden">
-    <div class="absolute inset-0 overflow-hidden">
-      <div class="fixed inset-y-0 right-0 flex max-w-full pl-10">
-        <!--
-          Slide-over panel, show/hide based on slide-over state.
-
-          Entering: "transform transition ease-in-out duration-500 sm:duration-700"
-            From: "translate-x-full"
-            To: "translate-x-0"
-          Leaving: "transform transition ease-in-out duration-500 sm:duration-700"
-            From: "translate-x-0"
-            To: "translate-x-full"
-        -->
-        <div class="relative w-screen max-w-md">
-          <!--
-            Close button, show/hide based on slide-over state.
-
-            Entering: "ease-in-out duration-500"
-              From: "opacity-0"
-              To: "opacity-100"
-            Leaving: "ease-in-out duration-500"
-              From: "opacity-100"
-              To: "opacity-0"
-          -->
-          <!-- <div class="absolute left-0 top-0 -ml-8 flex pr-2 pt-4 sm:-ml-10 sm:pr-4">
-            <button type="button" class="relative rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white">
-              <span class="absolute -inset-2.5"></span>
-              <span class="sr-only">Close panel</span>
-              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div> -->
-
-          <div class="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
-            <div class="flex justify-between items-center px-4 sm:px-6">
-              <h2 class="text-base font-semibold leading-6 text-gray-900" id="slide-over-title">Asset detail</h2>
-              <FontAwesomeIcon
-                class="cursor-pointer" 
-                :icon="faXmark" 
-                @click="emit('panel:close')"
-              />
-            </div>
-            <div class="relative mt-6 flex-1 px-4 sm:px-6">
-              <div v-if="asset">
-                <div>{{ asset.id }}</div>
-                <div>{{ asset.name }}</div>
-                <div>{{ asset.description }}</div>
-                <div>{{ asset.value }}</div>
-                <div>{{ asset.location }}</div>
+  <div v-if="opened" class="relative z-10">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-30 transition-opacity" aria-hidden="true" />
+    <div class="fixed inset-0 overflow-hidden">
+      <div class="absolute inset-0 overflow-hidden">
+        <div class="fixed inset-y-0 right-0 flex max-w-full pl-10">
+          <div class="relative w-screen max-w-md">
+            <div class="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
+              <div class="flex justify-between items-center px-4 sm:px-6">
+                <span class="text-2xl font-semibold leading-6">Asset detail</span>
+                <FontAwesomeIcon
+                  class="cursor-pointer"
+                  :icon="faXmark"
+                  @click="emit('panel:close')"
+                />
+              </div>
+              <div class="relative mt-6 flex-1 px-4 sm:px-6">
+                <div v-if="asset">
+                  <div class="flex items-center gap-2 font-semibold border-b mb-4 border-neutral-200 text-gray-800">
+                    <span class="text-xs">#{{ asset.id }}</span>
+                    <span class="text-xl">{{ asset.name }}</span>
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <div class="flex gap-2">
+                      <FontAwesomeIcon
+                        size="lg"
+                        class="text-blue-600 mt-1"
+                        :icon="faBook"
+                      />
+                      <div class="flex flex-col gap-1 text-gray-800">
+                        <span>Description</span>
+                        <span class="text-sm font-semibold">{{ asset.description || "Not provided" }}</span>
+                      </div>
+                    </div>
+                    <div class="flex gap-2">
+                      <FontAwesomeIcon
+                        size="lg"
+                        class="text-blue-600 mt-1"
+                        :icon="faDollarSign"
+                      />
+                      <div class="flex flex-col gap-1 text-gray-800">
+                        <span>Worth</span>
+                        <span class="text-sm font-semibold">{{ asset.value || "Not provided" }}</span>
+                      </div>
+                    </div>
+                    <div class="flex gap-2">
+                      <FontAwesomeIcon
+                        size="lg"
+                        class="text-blue-600 mt-1"
+                        :icon="faLocationDot"
+                      />
+                      <div class="flex flex-col gap-1 text-gray-800">
+                        <span>Location</span>
+                        <span class="text-sm font-semibold">{{ asset.location || "Not provided" }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -69,36 +63,34 @@
       </div>
     </div>
   </div>
-</div>
-
 </template>
 
 <script setup lang="ts">
-import TextInput from '../components/TextInput.vue';
 import { ref, watch } from 'vue';
 import { apiGetAssetById } from '../api/assets';
 import { Asset } from '../types/assets';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faDollarSign, faLocationDot, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faBook } from '@fortawesome/free-solid-svg-icons';
 
 interface AssetDetailPanelProps {
-  id: number;
+  id: string;
   opened: boolean;
 }
 
 const props = defineProps<AssetDetailPanelProps>();
 
-const emit = defineEmits<{ (e: 'panel:close'): void }>();
+const emit = defineEmits<{(e: 'panel:close'): void }>();
 
 const asset = ref<Asset | null>(null);
 
-function onCreated() { 
+function onCreated() {
   apiGetAssetById(props.id).then((response) => {
     asset.value = response.data;
   });
 }
 
-watch(() => props.id, (value) => { 
+watch(() => props.id, (value) => {
   apiGetAssetById(value).then((response) => {
     asset.value = response.data;
   });
