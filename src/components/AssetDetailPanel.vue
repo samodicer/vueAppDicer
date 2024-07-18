@@ -1,6 +1,6 @@
 <template>
   <div v-if="opened" class="relative z-10">
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-30 transition-opacity" aria-hidden="true" />
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-30" />
     <div class="fixed inset-0 overflow-hidden">
       <div class="absolute inset-0 overflow-hidden">
         <div class="fixed inset-y-0 right-0 flex max-w-full pl-10">

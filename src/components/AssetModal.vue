@@ -1,9 +1,9 @@
 <template>
   <div v-if="opened" class="fixed z-40 inset-0 flex items-center justify-center overflow-hidden">
-    <div class="fixed inset-0 transition-opacity">
+    <div class="fixed inset-0">
       <div class="absolute inset-0 bg-gray-500 bg-opacity-30" />
     </div>
-    <div class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
+    <div class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-[600px]">
       <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
         <h3 class="text-2xl font-semibold leading-6 mb-4">
           {{ variant === AssetModalVariant.CREATE ? 'Create asset' : 'Update asset' }}

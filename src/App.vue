@@ -1,13 +1,10 @@
 <template>
-  <div class="w-full h-full bg-white">
+  <div>
     <router-view />
   </div>
 </template>
 
 <style>
-* {
-  font-family: 'Trebuchet MS', sans-serif;
-}
 #app {
   height: 100vh;
 }
