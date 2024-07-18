@@ -1,4 +1,4 @@
-# vueappdicer
+# vueAppDicer
 
 ## Project setup
 ```
