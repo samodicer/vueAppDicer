@@ -15,27 +15,10 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue';
-import { NotificationMessage, NotificationVariant } from '../types/notifications';
+import { useNotification } from '../composables/useNotification';
+import { NotificationVariant } from '../types/notifications';
 
-interface NotificationProps {
-  message?: NotificationMessage;
-}
-
-const props = withDefaults(defineProps<NotificationProps>(), {
-  message: undefined,
-});
-
-const emit = defineEmits<{(e: 'remove:message'): void }>();
-
-let notificationTimeout: ReturnType<typeof setTimeout>;
-
-watch(() => props.message, (value) => {
-  if (value) {
-    clearTimeout(notificationTimeout);
-    notificationTimeout = setTimeout(() => emit('remove:message'), 4000);
-  }
-});
+const { message } = useNotification();
 </script>
 
 <style>

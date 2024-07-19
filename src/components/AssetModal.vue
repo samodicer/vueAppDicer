@@ -27,7 +27,7 @@
           class="mt-2"
           :value="assetValue"
           :error-message="worthValidationError"
-          placeholder="Asset worth"
+          placeholder="Asset worth in €"
           label="Worth"
           type="number"
           @update:value="assetValue = $event; validateWorth($event)"
@@ -58,6 +58,8 @@ import Button from './Button.vue';
 import { computed, ref, watch } from 'vue';
 import { apiCreateAsset, apiUpdateAsset } from '../api/assets';
 import { AssetModalVariant, CreateAssetData } from '../types/assets';
+import { NotificationVariant } from '../types/notifications';
+import { useNotification } from '../composables/useNotification';
 
 interface AssetModalProps {
   opened: boolean;
@@ -70,8 +72,7 @@ interface AssetModalProps {
 
 interface AssetModalEmits {
   (e: 'modal:close'): void;
-  (e: 'asset:created'): void;
-  (e: 'asset:updated'): void;
+  (e: 'modal:confirm'): void;
   (e: 'error:message', message: string): void;
 }
 
@@ -79,6 +80,9 @@ const props = defineProps<AssetModalProps>();
 
 const emit = defineEmits<AssetModalEmits>();
 
+const { setMessage } = useNotification();
+
+/* Compute modal variant based on id */
 const variant = computed(() => {
   if (props.id) {
     return AssetModalVariant.UPDATE;
@@ -86,6 +90,7 @@ const variant = computed(() => {
   return AssetModalVariant.CREATE;
 });
 
+/* Check if there are validation errors */
 const isValid = computed(() => {
   return assetName.value && !nameValidationError.value && !worthValidationError.value;
 });
@@ -98,6 +103,7 @@ const assetLocation = ref('');
 const nameValidationError = ref('');
 const worthValidationError = ref('');
 
+/* If id is changed, apply data to prefill inputs */
 watch(() => props.id, (value) => {
   if (value !== undefined) {
     assetName.value = props.name || '';
@@ -121,6 +127,7 @@ function onClose() {
   emit('modal:close');
 }
 
+/* Validation for name input */
 function validateName(name: string) {
   if (!name) {
     nameValidationError.value = 'The name is required';
@@ -133,14 +140,20 @@ function validateName(name: string) {
   nameValidationError.value = '';
 }
 
+/* Validation for worth input */
 function validateWorth(worth: string) {
   if (parseInt(worth) < 0) {
     worthValidationError.value = 'The worth must not be a negative number';
     return;
   }
+  if (isNaN(Number(worth))) {
+    worthValidationError.value = 'The worth must be a valid number';
+    return;
+  }
   worthValidationError.value = '';
 }
 
+/* Create asset api call */
 function createAsset() {
   const data: CreateAssetData = {
     name: assetName.value,
@@ -149,13 +162,18 @@ function createAsset() {
     location: assetLocation.value,
   };
   apiCreateAsset(data).then(() => {
-    emit('asset:created');
+    emit('modal:confirm');
+    setMessage({
+      type: NotificationVariant.SUCCESS,
+      text: 'Asset has been successfully created'
+    });
     onClose();
   }).catch((err) => {
     emit('error:message', err.message);
   });
 }
 
+/* Update asset api call */
 function updateAsset() {
   if (!props.id) {
     return;
@@ -167,10 +185,17 @@ function updateAsset() {
     location: assetLocation.value,
   };
   apiUpdateAsset(props.id, data).then(() => {
-    emit('asset:updated');
+    emit('modal:confirm');
+    setMessage({
+      type: NotificationVariant.SUCCESS,
+      text: 'Asset has been successfully updated'
+    });
     onClose();
   }).catch((err) => {
-    emit('error:message', err.message);
+    setMessage({
+      type: NotificationVariant.ERROR,
+      text: err.message
+    });
   });
 }
 </script>
