@@ -34,7 +34,7 @@
             />
             <div class="flex flex-col gap-1 text-gray-800">
               <span>Worth</span>
-              <span class="text-sm font-semibold">{{ `${asset.value}€` || "Not provided" }}</span>
+              <span class="text-sm font-semibold">{{ asset.value ? `${asset.value}€` : "Not provided" }}</span>
             </div>
           </div>
           <div class="flex gap-2">
